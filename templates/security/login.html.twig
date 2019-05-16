@@ -1,0 +1,67 @@
+{% extends 'cover.html.twig' %}
+
+{% block title %}Log in{% endblock %}
+
+
+{% block stylesheets %}
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+    <link href="{{ asset('/css/signin.css') }}" rel="stylesheet">
+{% endblock %}
+
+
+
+{% block btnHeader %}
+
+<a href="{{ path('app_register') }}" class="btn btn-secondary ml-3">Sign up </a>
+
+{% endblock %}
+
+
+    {% block main %}
+        <form class="form-signin" method="post">
+
+
+            <h1 class="h3 mb-5 font-weight-normal">Please, log in</h1>
+
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+
+            <input type="email" id="inputEmail" class="form-control" value="{{ last_username }}" name="email"
+                   placeholder="Email address" required autofocus>
+
+            <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password"
+                   required>
+
+            <input type="hidden" name="_csrf_token"
+                   value="{{ csrf_token('authenticate') }}">
+
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" name="_remember_me"> Remember me
+                </label>
+            </div>
+            <button class="btn btn-lg btn-block" type="submit">Log in</button>
+        </form>
+    {% endblock %}
+
+

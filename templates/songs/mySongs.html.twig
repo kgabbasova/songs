@@ -1,0 +1,190 @@
+{% extends 'cover.html.twig' %}
+
+{% block title %} My songs {% endblock %}
+
+{% block stylesheets %}
+    <style>
+        li .description:hover {
+
+            color: #0b8f89;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+
+{% block nav %}
+
+    <a class="nav-link active" href="{{ path ('mySongs') }}">My songs</a>
+    <a class="nav-link" href="{{ path ('addSong') }}">Add a song</a>
+    <a class="nav-link " href="{{ path ('allSongs') }}">All songs</a>
+
+{% endblock %}
+
+
+{% block main %}
+
+    <h1 class="cover-heading mb-5">My songs</h1>
+    {% if songs is not empty %}
+        <audio id="audio" src="" controls preload="metadata" class="mb-5" style="width: 80%; "></audio>
+        <div class="text-left">
+            <ol>
+                {% for song in songs %}
+                    <li>
+                        <div class="row col-10">
+                            <div class="col-8 description" id="{{ song.id }}">
+                                <p class="mb-1">{{ song.title }} - {{ song.singer }}</p>
+                                <p class="small">Genre: {{ song.genre }}</p>
+                            </div>
+
+                            {% if song.songLikes is not empty %}
+                                <div class="modal text-dark" id="likesModal{{ song.id }}" role="dialog">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title">These users liked this song</h4>
+                                                <button type="button" class="close" data-dismiss="modal">&times;
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <ol>
+                                                    {% for like in song.songlikes %}
+                                                        <li>
+                                                            {{ like.userLiked.email }}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ol>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                    Close
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+
+                            <div class="col-4 row">
+
+
+                                <form
+                                        {% if   song.isUserLiked %} action=" {{ path('removeLike', {'id': song.id}) }}"
+                                        {% else %} action=" {{ path('likeSong', {'id': song.id}) }}"
+                                        {% endif %}
+                                        method="post"
+                                        id="song-like-{{ song.id }}">
+                                    <input type="image" class="likeSong mt-1 mr-0" src="/images/like.png" height="20px"
+                                           alt="like"
+                                           style="cursor: pointer;">
+                                    <span class="mr-2 {% if song.isUserLiked %}text-success {% endif %}"
+                                          data-toggle="modal" data-target="#likesModal{{ song.id }}"
+                                          style="cursor: pointer;"> {{ song.likesAmount }}</span>
+                                    <input type="hidden" name="dislike"
+                                           value="{{ song.isUserDisliked }}">
+                                    <input type="hidden" name="_csrf_token"
+                                           value="{{ csrf_token('authenticate') }}">
+                                </form>
+
+
+                                <form
+                                        {% if   song.isUserDisliked %} action=" {{ path('removeDislike', {'id': song.id}) }}"
+                                        {% else %} action=" {{ path('dislikeSong', {'id': song.id}) }}"
+                                        {% endif %}
+                                        method="post"
+                                        id="song-dislike-{{ song.id }}">
+
+                                    <input type="image" class="dislikeSong" src="/images/dislike.png" height="25px"
+                                           alt="dislike"
+                                           style="cursor: pointer;">
+                                    <span class="mr-3 {% if song.isUserDisliked %}text-success {% endif %}">{{ song.dislikesAmount }} </span>
+                                    <input type="hidden" name="like"
+                                           value="{{ song.isUserLiked }}">
+                                    <input type="hidden" name="_csrf_token"
+                                           value="{{ csrf_token('authenticate') }}">
+                                </form>
+
+
+                                <form action="{{ path('deleteSong', {'id': song.id}) }}" method="post"
+                                      id="song-delete-{{ song.id }}">
+                                    <img class="deleteSong" src="/images/delete.png" height="25px" alt="delete"
+                                         data-toggle="modal" data-target="#deleteModal" style="cursor: pointer;">
+                                    <input type="hidden" name="_csrf_token"
+                                           value="{{ csrf_token('authenticate') }}">
+                                </form>
+
+                            </div>
+                        </div>
+
+                    </li>
+                {% endfor %}
+            </ol>
+
+
+            <form action="{{ path('mySongs') }}" method="get">
+
+                <input type="submit"  class="btn btn-secondary" value="Sort">
+                <select name="sort" class="btn btn-secondary">
+                    <option value="title">Title</option>
+                    <option value="singer">Singer</option>
+                    <option value="genre">Genre</option>
+                    <option value="likesAmount">Likes</option>
+                </select>
+
+            </form>
+
+        </div>
+    {% else %}
+        <h3 class="text-danger mb-4">No songs yet!</h3>
+        <a href="{{ path('addSong') }}" class="btn btn-lg btn-secondary">Add song</a>
+
+    {% endif %}
+
+
+    <div class="modal text-dark" id="deleteModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm delete</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    Do you really want to delete this song?
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" id="btn-delete" class="btn btn-info">Yes</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+{% block javascripts %}
+    <script>
+        var alles_li = document.getElementsByClassName("description");
+        for (var i = 0; i < alles_li.length; i++) {
+            alles_li[i].onclick = function () {
+                audio.src = '/songs/' + this.id;
+                audio.play();
+            }
+        }
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/base.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+{% endblock %}

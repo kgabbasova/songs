@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+
+
+    <link href="{{ asset('/css/bootstrap.css') }}" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="{{ asset('/css/core.css') }}" rel="stylesheet">
+
+    {% block stylesheets %} {% endblock %}
+
+</head>
+
+
+<body class="text-center row h-100 justify-content-center ml-1 mr-1">
+
+
+<header class="masthead mb-auto  row col-10 p-3 mt-3">
+
+
+    <div class="col-4 row align-content-center">
+        <a href="{{ path('home') }}"><img class="logo mr-3" src="/images/plate.png" alt="logo" height="50"></a>
+        <h3 class="masthead-brand mt-auto mb-auto">MusBox </h3>
+    </div>
+
+
+    <nav class="nav nav-masthead justify-content-around col-4 align-content-center">
+
+        {% block nav %}
+            {% if is_granted('ROLE_USER') %}
+                <a class="nav-link " href="{{ path ('mySongs') }}">My songs</a>
+                <a class="nav-link active"  href="{{ path ('addSong') }}">Add a song</a>
+                <a class="nav-link " href="{{ path('allSongs') }}">All songs</a>
+            {% else %}
+                <a class="nav-link active" href="{{ path('home') }}">Home</a>
+                <a class="nav-link" href="#about-us">About us</a>
+                {#        <a class="nav-link" href="#">See all songs</a>#}
+            {% endif %}
+        {% endblock %}
+
+    </nav>
+
+    <div class="col-4 align-content-center justify-content-end">
+
+        {% block btnHeader %}
+
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_logout') }}" class="btn btn-secondary ml-3">Logout</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-secondary ml-3">Log in</a>
+                <a href="{{ path('app_register') }}" class="btn btn-secondary ml-3">Sign up</a>
+            {% endif %}
+
+        {% endblock %}
+    </div>
+
+</header>
+
+
+<div class="cover-container col-8  p-3 mx-auto">
+
+    <main role="main" class="inner cover">
+        {% block main %} {% endblock %}
+    </main>
+
+</div>
+
+
+<footer class="mastfoot mt-auto mb-3 col-8">
+
+    <div class="inner">
+        <p id="about-us"><a href="https://getbootstrap.com/">&copy; 2019 MusBox, Inc.</a>
+        </p>
+    </div>
+
+</footer>
+
+
+{% block javascripts %}{% endblock %}
+
+</body>
+</html>
